@@ -4,18 +4,21 @@ local M = {}
 
 function M.setup()
     vim.api.nvim_create_user_command("RkLiveGrep", function()
+        -- Reset to defaults
+        core.search_opts.case_sensitive = true
+        core.search_opts.whole_word = true
+        core.search_opts.is_regex = false
         core.live_grep_with_flags("", false)
     end, { desc = "Live Grep with togglable VS Code like flags" })
 
     vim.api.nvim_create_user_command("RkGlobalReplace", function()
-        -- Use preferred defaults (Case On, Regex Off, Word Off)
+        -- Use preferred defaults (Case On, Word On, Regex Off)
         core.search_opts.case_sensitive = true
+        core.search_opts.whole_word = true
         core.search_opts.is_regex = false
-        core.search_opts.whole_word = false
 
-        local search_text = vim.fn.expand("<cword>")
         -- Show search picker first to let user choose parameters
-        core.live_grep_with_flags(search_text, true)
+        core.live_grep_with_flags("", true)
     end, { desc = "Global Replace with togglable VS Code like flags" })
 
     vim.api.nvim_create_user_command("RkGlobalReplaceUndo", function()

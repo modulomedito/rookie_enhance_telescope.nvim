@@ -2,8 +2,8 @@ local M = {}
 
 -- Search state
 M.search_opts = {
-    case_sensitive = false,
-    whole_word = false,
+    case_sensitive = true,
+    whole_word = true,
     is_regex = false,
 }
 
@@ -384,10 +384,14 @@ function M.global_replace_undo()
     end
 end
 
-function M.live_grep_with_flags(default_text, is_replace)
+function M.live_grep_with_flags(default_text, is_replace, is_refresh)
     local builtin = require("telescope.builtin")
     local actions = require("telescope.actions")
     local action_state = require("telescope.actions.state")
+
+    if not is_refresh and (default_text == nil or default_text == "") then
+        default_text = vim.fn.expand("<cword>")
+    end
 
     local prefix = is_replace and "Global Replace" or "Live Grep"
     local title = string.format(
@@ -415,7 +419,7 @@ function M.live_grep_with_flags(default_text, is_replace)
                 end
 
                 actions.close(prompt_bufnr)
-                M.live_grep_with_flags(current_input, is_replace)
+                M.live_grep_with_flags(current_input, is_replace, true)
             end
 
             local function start_replace()
