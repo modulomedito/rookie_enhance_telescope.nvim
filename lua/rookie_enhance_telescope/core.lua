@@ -403,20 +403,14 @@ function M.live_grep_with_flags(default_text, is_replace, is_refresh)
     )
 
     local vimgrep_args = M.get_vimgrep_args()
+    local sorters = require("telescope.sorters")
 
     builtin.live_grep({
         cwd = vim.fn.getcwd(),
         prompt_title = title,
         default_text = default_text,
         vimgrep_arguments = vimgrep_args,
-        additional_args = function()
-            -- Extract only the flags, excluding the base "rg" command
-            local extra = {}
-            for i = 2, #vimgrep_args do
-                table.insert(extra, vimgrep_args[i])
-            end
-            return extra
-        end,
+        sorter = sorters.get_substr_matcher(),
         attach_mappings = function(prompt_bufnr, map)
             local function refresh_with_toggle(toggle_key)
                 local current_input = action_state.get_current_line()
