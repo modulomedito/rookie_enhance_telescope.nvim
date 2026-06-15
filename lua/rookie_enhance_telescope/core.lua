@@ -332,11 +332,13 @@ function M.apply_global_replace(search_text)
                 local replace_text = action_state.get_current_line()
                 actions.close(prompt_bufnr)
 
-                vim.fn.setqflist({}, "r")
-                vim.fn.setqflist({}, "a", {
-                    title = "Replace: " .. search_text .. " -> " .. replace_text,
-                    lines = output,
-                })
+                -- Use noautocmd to prevent global QuickFixCmdPost from opening the window automatically
+                local qf_title = "Replace: " .. search_text .. " -> " .. replace_text
+                local qf_action = { title = qf_title, items = {}, lines = output }
+                vim.api.nvim_exec2([[
+                    noautocmd call setqflist([], 'r')
+                ]], {})
+                vim.fn.setqflist({}, "a", qf_action)
 
                 local nv_replace_final = build_substitute_replace(replace_text)
                 local cmd = string.format("cfdo %%s/%s/%s/ge | update", nv_search, nv_replace_final)
