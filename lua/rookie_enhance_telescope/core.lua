@@ -402,11 +402,21 @@ function M.live_grep_with_flags(default_text, is_replace, is_refresh)
         M.search_opts.is_regex and "On" or "Off"
     )
 
+    local vimgrep_args = M.get_vimgrep_args()
+
     builtin.live_grep({
         cwd = vim.fn.getcwd(),
         prompt_title = title,
         default_text = default_text,
-        vimgrep_arguments = M.get_vimgrep_args(),
+        vimgrep_arguments = vimgrep_args,
+        additional_args = function()
+            -- Extract only the flags, excluding the base "rg" command
+            local extra = {}
+            for i = 2, #vimgrep_args do
+                table.insert(extra, vimgrep_args[i])
+            end
+            return extra
+        end,
         attach_mappings = function(prompt_bufnr, map)
             local function refresh_with_toggle(toggle_key)
                 local current_input = action_state.get_current_line()
